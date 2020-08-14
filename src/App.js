@@ -11,40 +11,55 @@ class App extends Component {
     employeeData: [],
     employeeResults: []
   }
-  //can we sort on load
+  //l2sort
   componentDidMount() {
     API.getRandomEmployee()
-    .then(res => {
-      this.setState({ employeeData: res.data.results })
-      .catch(err => { console.log(err)});
-    });
-  }
-  //might need to change filter or delete
-  findAge = age => {
-    const friends = this.state.employeeData.filter(employee => employee.age === age);
-    this.setState({ employeeData: friends });
+      .then(res => {
+        const data = res.data.results.sort((a, b) => {
+          if (a.name.last > b.name.last) {
+            return 1;
+          }
+          if (a.name.last < b.name.last) {
+            return -1;
+          }
+          return 0;
+        })
+        this.setState({ employeeResults: data });
+        this.setState({ employeeData: data });
+      })
+      .catch(err => { console.log(err) });
   }
 
   handleFormSubmit = event => {
-    event.preventdefault();
-    let filtered = employeeData.filter(search);
-    this.setState({
-      search: "",
-      employeeResults: filtered
-  });
+    event.preventDefault();
+    let filtered = null;
+    if (this.state.search) {
+      if(Number.isInteger(parseInt(this.state.search))) {
+        filtered = this.state.employeeData.filter(employee => employee.dob.age === parseInt(this.state.search));
+      }
+      else {
+        filtered = this.state.employeeData.filter((data) => (data.name.first.includes(this.state.search) || data.name.last.includes(this.state.search)));
+      }
+      this.setState({employeeData: filtered});
+    } else {
+      this.setState({employeeData: this.state.employeeResults})
+    }
   }
+
   handleInputChange = event => {
-  this.setState({search: event.target.value});
+    event.preventDefault();
+    this.setState({ search: event.target.value });
   }
+
   //How should I pass results into employee container
   render() {
     return (
       <div>
         <SearchContainer
-        handleFormSubmit= {this.handleFormSubmit}
-        handleInputChange= {this.handleInputChange}
+          handleFormSubmit={this.handleFormSubmit}
+          handleInputChange={this.handleInputChange}
         />
-        <EmployeeContainer results={ this.state.employeeResults }/>
+        <EmployeeContainer results={this.state.employeeData} />
       </div>
     )
   }

@@ -8,12 +8,9 @@ function SearchContainer(props){
                 <input
                 value={props.search}
                 onChange={props.handleInputChange}
-                type="number"
                 className="form-control"
                 placeholder="Search by Age"
                 id="employee-search"
-                min="18"
-                max="65"
                 />
                 <button type="submit" onClick={props.handleFormSubmit} className="btn btn-success">
                     Search
